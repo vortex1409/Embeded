@@ -1,1 +1,3 @@
-
+subwf   0x03E,1,0
+subfwb  0x02D,0,0
+subwf   0x01A,1,0
