@@ -1,1 +1,4 @@
-
+movlw 0x5
+subwf 0x03C,1,0
+subwf 0x030,1,0
+subwf 0x03E,1,0
