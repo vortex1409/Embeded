@@ -1,6 +1,6 @@
 #include "p18f45k20.inc"
 
-STATUS_TEMP	EQU 0x20 ; Equate STATUS_TEMP to 20h
+STATUS_TEMP	EQU 0x020 ; Equate STATUS_TEMP to 20h
 BSR_TEMP	EQU 0x021 ; Equate BSR_TEMP to 21h
 WREG_TEMP	EQU 0x022 ; Equate WREG_TEMP to 22h
 	
@@ -25,9 +25,9 @@ Initalize:
 	clrf	TRISD, A
 	
 	bsf	TRISB, RD0, A
-	bcf	INTCON2, INTEDG0, A ; Rising Edge Trigger
-	;bcf	INTCON2, INTEDG1, A ;Part 3 Falling Edge Trigger
-	bcf	INTCON, INT0IE, A
+	bcf	INTCON2, INTEDG0, A ;  Part ? Falling Edge Trigger
+	;bcf	INTCON2, INTEDG1, A ;Part 3 Rusing Edge Trigger
+	bsf	INTCON, INT0IE, A ; bsf
 	
 	movlw	B'10000010' ; 2 Second On/Off pulse
 	;movlw   B'10000000' ;Faster Hearbeat
@@ -54,7 +54,7 @@ HPIEP:
     btfsc	INTCON, INT0IF, A
     call	Int0ISR
     
-    movf	WREG_TEMP, w, A
+    movf	WREG_TEMP, W, A
     movff	BSR_TEMP, BSR
     movff	STATUS_TEMP, STATUS
     
