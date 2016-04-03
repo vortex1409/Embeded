@@ -22,14 +22,14 @@ LPIV		code	    0x18
 GLEP:
 		call	    Initialize
 GLEPLoop:
-		btfsc	    SYSFLAGS, SYSF_TICK,A
+		btfsc	    SYSFLAGS, _SYSF_TICK,A
 		call	    SysTickHandler
 		bra	    GLEPLoop
 
 Initialize:
 		; Increase System Clock to 64 MHz
 		movlw	    0x070
-		iorwf	    OSCON,F,A
+		iorwf	    OSCCON,F,A
 		bsf	    OSCTUNE,PLLEN,A
 		
 		; Configure LED Interface
@@ -88,7 +88,7 @@ SysTickHandlerRelay:
 		bz	    SysTickHandlerDone
 		
 		; Decrement a 2 byte variable
-		movf	    FLYCTR+0,F,A
+		movf	    RLYCTR+0,F,A
 		btfsc	    STATUS,Z,A
 		decf	    RLYCTR+1,F,A
 		decF	    RLYCTR+0,F,A
