@@ -2,7 +2,7 @@
 
 _SYSF_TICK	EQU	    0
 _SYSF_DA	EQU	    1
-_TC_HEARTBEAT	EQU	    D'???'
+_TC_HEARTBEAT	EQU	    D'224'
 
 		udata_acs   0x000
 	
@@ -24,7 +24,7 @@ HPIEP:
     movff   BSR,HPI_CONTEXT+1
     movwf   HPI_CONTEXT+2,A
     
-    btfsc   INTCON,TM0IF,A
+    btfsc   INTCON,TMR0IF,A
     call    Timer0ISR
     
     movf    HPI_CONTEXT+2,W,A
@@ -62,8 +62,8 @@ Initialize:
     bcf	    TRISC,RC7,A
     movlw   0x88
     movwf   T0CON,A
-    bsf	    INTCON2,TM0IP,A
-    bsf	    INTCON,TM0IE,A
+    bsf	    INTCON2,TMR0IP,A
+    bsf	    INTCON,TMR0IE,A
     call    AnalogInit
     clrf    SYSFLAGS,A
     bsf	    RCON,IPEN,A
@@ -84,7 +84,7 @@ AnalogInit:
     bcf	    TRISC,RC1,A
     bcf	    IPR1,ADIP,A
     bcf	    IPR1,ADIE,A
-    bsf	    ADCON0,,GO,A
+    bsf	    ADCON0,GO,A
     return
 GLEP:
     call    Initialize
@@ -95,7 +95,7 @@ GLEPLoop:
     call    AnalogHandler
     bra	    GLEPLoop
 SysTickHandler:
-    bcf	    SYSFLAGS,SYSF_TICK,A
+    bcf	    SYSFLAGS,_SYSF_TICK,A
     decfsz  HEARTBEAT,F,A
     bra	    SysTickHandlerDone
     btg	    LATC,RC7,A
