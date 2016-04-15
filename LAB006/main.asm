@@ -1,10 +1,10 @@
-#include    "p18f45k20.inc"
-_SYSF_TICK EQU     0
-_SYSF_DA EQU     1
-_SYSF_MC EQU     2
-_TC_HEARTBEAT EQU     D'61'
+#include            "p18f45k20.inc"
+_SYSF_TICK        EQU     0
+_SYSF_DA          EQU     1
+_SYSF_MC          EQU     2
+_TC_HEARTBEAT     EQU     D'61'
   
-    udata_acs   0x000
+                  udata_acs   0x000
     
 HPI_CONTEXT RES 3
 LPI_CONTEXT RES 3
