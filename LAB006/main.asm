@@ -1,226 +1,228 @@
-#include            "p18f45k20.inc"
-_SYSF_TICK        EQU     0
-_SYSF_DA          EQU     1
-_SYSF_MC          EQU     2
-_TC_HEARTBEAT     EQU     D'61'
+		#include "p18f45k20.inc"
+
+_SYSF_TICK	EQU	    0
+_SYSF_DA	EQU	    1
+_SYSF_MC	EQU	    2
+_TC_HEARTBEAT	EQU	    D'61'
   
-                  udata_acs   0x000
+                udata_acs   0x000
     
-HPI_CONTEXT RES 3
-LPI_CONTEXT RES 3
-SYSFLAGS RES 1
-HEARTBEAT RES 1
-ADATA  RES 2
+HPI_CONTEXT	res	    3
+LPI_CONTEXT	res	    3
+SYSFLAGS	res	    1
+HEARTBEAT	res	    1
+ADATA		res	    2
    
-RSTV  CODE 0X0000
-   GOTO GLEP
-HPIV  CODE 0X0008
-   GOTO HPIEP
-LPIV  CODE 0X0018
-   GOTO LPIEP
+RSTV		code	    0X0000
+		goto	    GLEP
+HPIV		code	    0X0008
+		goto	    HPIEP
+LPIV		code	    0X0018
+		goto	    LPIEP
     
 HPIEP:     
      
-     MOVFF   STATUS,HPI_CONTEXT+0
-     MOVFF   BSR,HPI_CONTEXT+1
-     MOVWF   HPI_CONTEXT+2,A
+		movff	    STATUS,HPI_CONTEXT+0
+		movff	    BSR,HPI_CONTEXT+1
+		movwf	    HPI_CONTEXT+2,A
      
-     BTFSC   INTCON,TMR0IF,A
-     CALL    Timer0ISR
+		btfsc	    INTCON,TMR0IF,A
+		call	    Timer0ISR
      
-     MOVF    HPI_CONTEXT+2,W,A
-     MOVFF   HPI_CONTEXT+1,BSR
-     MOVFF   HPI_CONTEXT+0,STATUS
+		movf	    HPI_CONTEXT+2,W,A
+		movff	    HPI_CONTEXT+1,BSR
+		movff	    HPI_CONTEXT+0,STATUS
      
-     RETFIE
+		retfie
      
 LPIEP:
      
-     MOVFF   STATUS,LPI_CONTEXT+0
-     MOVFF   BSR,LPI_CONTEXT+1
-     MOVWF   LPI_CONTEXT+2,A
+		movff	    STATUS,LPI_CONTEXT+0
+		movff	    BSR,LPI_CONTEXT+1
+		movwf	    LPI_CONTEXT+2,A
      
-     BTFSC   PIR1,ADIF,A
-     CALL    AnalogISR
+		btfsc	    PIR1,ADIF,A
+		call	    AnalogISR
      
-     MOVF    LPI_CONTEXT+2,W,A
-     MOVFF   LPI_CONTEXT+1,BSR
-     MOVFF   LPI_CONTEXT+0,STATUS
+		movf	    LPI_CONTEXT+2,W,A
+		movff	    LPI_CONTEXT+1,BSR
+		movff	    LPI_CONTEXT+0,STATUS
      
-     RETFIE
+		retfie
      
 Timer0ISR:
      
-     BCF     INTCON,TMR0IF,A
-     BSF     SYSFLAGS,_SYSF_TICK,A
-     RETURN
+		bcf	    INTCON,TMR0IF,A
+		bsf	    SYSFLAGS,_SYSF_TICK,A
+		
+		return
      
 AnalogISR:
      
-     BCF     PIR1,ADIF,A
-     BSF     SYSFLAGS,_SYSF_DA,A
+		bcf	    PIR1,ADIF,A
+		bsf	    SYSFLAGS,_SYSF_DA,A
      
-     MOVFF   ADRESL,ADATA+0
-     MOVFF   ADRESH,ADATA+1
+		movff	    ADRESL,ADATA+0
+		movff	    ADRESH,ADATA+1
      
-     RETURN
+		return
     
 Initialize:
      
-     MOVLW   0X70
-     IORWF   OSCCON,F,A
-     BSF     OSCTUNE,PLLEN,A
+		movlw	    0X70
+		iorwf	    OSCCON,F,A
+		bsf	    OSCTUNE,PLLEN,A
     
-     CALL   SysTickInit
+		call	    SysTickInit
      
-     CALL    AnalogInit
+		call	    AnalogInit
      
-     CALL   MotorInit
+		call	    MotorInit
      
-     CLRF    SYSFLAGS,A
+		clrf	    SYSFLAGS,A
      
-     BSF     RCON,IPEN,A
-     BSF     INTCON,GIEL,A
-     BSF     INTCON,GIEH,A
+		bsf	    RCON,IPEN,A
+		bsf	    INTCON,GIEL,A
+		bsf	    INTCON,GIEH,A
      
-     RETURN
+		return
      
 SysTickInit:
     
-     BCF    LATC,RC7,A
-     BCF    TRISC,RC7,A
+		bcf	    LATC,RC7,A
+		bcf	    TRISC,RC7,A
      
-     MOVLW  0X88
-     MOVWF  T0CON,A
+		movlw	    0X88
+		movwf	    T0CON,A
      
-     BSF    INTCON2,TMR0IP,A
-     BSF    INTCON,TMR0IE,A
+		bsf	    INTCON2,TMR0IP,A
+		bsf	    INTCON,TMR0IE,A
      
-     RETURN
+		return
      
 AnalogInit:
      
-     BSF     TRISA,RA0,A
-     BSF     ANSEL,ANS0,A
+		bsf	    TRISA,RA0,A
+		bsf	    ANSEL,ANS0,A
      
-     CLRF   LATD,A
-     CLRF   TRISD,A
-     MOVLW  0XCF
-     ANDWF  LATC,F,A
-     ANDWF  TRISC,F,A
+		clrf	    LATD,A
+		clrf	    TRISD,A
+		movlw	    0XCF
+		andwf	    LATC,F,A
+		andwf	    TRISC,F,A
      
-     MOVLW   0X3E
-     MOVWF   ADCON2,A
+		movlw	    0X3E
+		movwf	    ADCON2,A
      
-     CLRF    ADCON1,A
+		clrf	    ADCON1,A
      
-     MOVLW   0X01
-     MOVWF   ADCON0,A
+		movlw	    0X01
+		movwf	    ADCON0,A
      
-     BCF     IPR1,ADIP,A
-     BSF     PIE1,ADIE,A
+		bcf	    IPR1,ADIP,A
+		bsf	    PIE1,ADIE,A
      
-     BSF     ADCON0,GO,A
+		bsf	    ADCON0,GO,A
      
-     RETURN
+		return
      
 MotorInit:
     
-    MOVLW   0XF0
-    ANDWF   LATC,F,A
-    ANDWF   TRISC,F,A
+		movlw	    0XF0
+		andwf	    LATC,F,A
+		andwf	    TRISC,F,A
     
-    CLRF    T2CON,A
-    MOVLW   D'127'
-    MOVWF   PR2,A
-    BSF     T2CON,TMR2ON,A
+		clrf	    T2CON,A
+		movlw	    D'127'
+		movwf	    PR2,A
+		bsf	    T2CON,TMR2ON,A
     
-    CLRF    CCPR1L,A
-    MOVLW   0X0C
-    MOVWF   CCP1CON,A
+		clrf	    CCPR1L,A
+		movlw	    0X0C
+		movwf	    CCP1CON,A
     
-    RETURN
+		return
      
 GLEP:
      
-     CALL    Initialize
+		call	    Initialize
      
 GLEPLoop:
      
-     BTFSC   SYSFLAGS,_SYSF_TICK,A
-     CALL    SysTickHandler
+		btfsc	    SYSFLAGS,_SYSF_TICK,A
+		call	    SysTickHandler
      
-     BTFSC   SYSFLAGS,_SYSF_DA,A
-     CALL    AnalogHandler
+		btfsc	    SYSFLAGS,_SYSF_DA,A
+		call	    AnalogHandler
      
-     BTFSC  SYSFLAGS,_SYSF_MC,A
-     CALL   MotorHandler
+		btfsc	    SYSFLAGS,_SYSF_MC,A
+		call	    MotorHandler
      
-     BRA     GLEPLoop
+		bra	    GLEPLoop
      
 SysTickHandler:
      
-     BCF     SYSFLAGS,_SYSF_TICK,A
-     DECFSZ  HEARTBEAT,F,A
-     BRA     SysTickHandlerDone
+		bcf	    SYSFLAGS,_SYSF_TICK,A
+		decfsz	    HEARTBEAT,F,A
+		bra	    SysTickHandlerDone
      
-     BTG     LATC,RC7,A
-     MOVLW   _TC_HEARTBEAT
-     MOVWF   HEARTBEAT,A
+		btg	    LATC,RC7,A
+		movlw	    _TC_HEARTBEAT
+		movwf	    HEARTBEAT,A
      
 SysTickHandlerDone:
      
-     RETURN
+		return
      
 AnalogHandler:
      
-     BCF     SYSFLAGS,_SYSF_DA
+		bcf	    SYSFLAGS,_SYSF_DA
      
-     MOVFF   ADATA+1,LATD
+		movff	    ADATA+1,LATD
      
-     MOVLW   0XCF
-     ANDWF   LATC,F,A
-     MOVF    ADATA+0,W,A
-     RRNCF   WREG,A
-     RRNCF   WREG,A
-     ANDLW   0X30
-     IORWF   LATC,F,A
+		movlw	    0XCF
+		andwf	    LATC,F,A
+		movf	    ADATA+0,W,A
+		rrncf	    WREG,A
+		rrncf	    WREG,A
+		andlw	    0X30
+		iorwf	    LATC,F,A
      
-     BSF    SYSFLAGS,_SYSF_MC,A
+		bsf	    SYSFLAGS,_SYSF_MC,A
      
-     RETURN
+		return
      
 MotorHandler:
      
-     BCF    SYSFLAGS,_SYSF_MC,A
-     btfsc  ADATA+1,7,A
-     BRA    MotorHandlerCW
+		bcf	    SYSFLAGS,_SYSF_MC,A
+		btfsc	    ADATA+1,7,A
+		bra	    MotorHandlerCW
 MotorHandlerCCW:
      
-     BCF    LATC,RC1,A
-     BSF    LATC,RC0,A
+		bcf	    LATC,RC1,A
+		bsf	    LATC,RC0,A
      
-     COMF   ADATA+1,F,A
-     COMF   ADATA+0,F,A
-     BRA    MotorHandlerSetSpeed
+		comf	    ADATA+1,F,A
+		comf	    ADATA+0,F,A
+		bra	    MotorHandlerSetSpeed
      
 MotorHandlerCW:
      
-     BCF    LATC,RC0,A
-     BSF    LATC,RC1,A
+		bcf	    LATC,RC0,A
+		bsf	    LATC,RC1,A
      
 MotorHandlerSetSpeed:
-     BSF    LATC,RC3
-     BCF    ADATA+1,7,A
-     RRNCF  ADATA+0,F,A
-     RRNCF  ADATA+0,W,A
-     ANDLW  0X30
-     BCF    CCP1CON,DC1B1,A
-     BCF    CCP1CON,DC1B0,A
-     IORWF  CCP1CON,A
-     MOVFF  ADATA+1,CCPR1L
+		bsf	    LATC,RC3
+		bcf	    ADATA+1,7,A
+		rrncf	    ADATA+0,F,A
+		rrncf	    ADATA+0,W,A
+		andlw	    0X30
+		bcf	    CCP1CON,DC1B1,A
+		bcf	    CCP1CON,DC1B0,A
+		iorwf	    CCP1CON,A
+		movff	    ADATA+1,CCPR1L
      
-     BSF    ADCON0,GO,A
-     RETURN
+		bsf	    ADCON0,GO,A
+		return
      
-     END​
+        end
