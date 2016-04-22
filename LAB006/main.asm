@@ -212,7 +212,7 @@ MotorHandlerCW:
 		bsf	    LATC,RC1,A
      
 MotorHandlerSetSpeed:
-		bsf	    LATC,RC3
+		bsf	    LATC,RC3,A
 		bcf	    ADATA+1,7,A
 		rrncf	    ADATA+0,F,A
 		rrncf	    ADATA+0,W,A
